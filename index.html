@@ -269,7 +269,7 @@ function renderWall(){
   const th=THEMES.find(t=>t.id===theme);
   $("p-title").textContent=th.title;$("p-text").textContent=th.text;
   const left=HEARTS-myHeartsIn(theme);$("hearts-left").textContent=`♡ ${left} of ${HEARTS} hearts left`;
-  $("as-who").textContent=myName?"Posting as "+myName+" in "+th.label:"";
+  $("as-who").textContent=myName?"Posting as "+myName:"";
   $("idea").placeholder="Your idea for "+th.label.replace(/^\d · /,"");
   const list=ideas.filter(i=>i.theme===theme).map(i=>({...i,n:voteCount(i.id)})).sort((a,b)=>b.n-a.n||a.createdAt-b.createdAt);
   const wall=$("wall");wall.innerHTML="";
