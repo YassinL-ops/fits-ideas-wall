@@ -1,185 +1,400 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Fits Ideas Wall</title>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#3F6873">
+<title>Fits Team Night</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;600;700&family=Bricolage+Grotesque:wght@600;800&family=Space+Mono:wght@400;700&display=swap">
 <style>
 [hidden]{display:none!important}
-body{margin:0}
-/* Layout: teal header with counters, four play tabs, a wall of idea cards sorted by hearts, input fixed at the bottom on phones. */
 :root{
-  --bg:#FBF4E6; --card:#FFFDF7; --fg:#10202C; --muted:#5D6B72; --line:rgba(16,32,44,.16);
-  --band:#3F6873; --band-fg:#FAEFD7; --accent:#E8823A; --on-accent:#10202C; --mint:#3AE2A2; --chip:#F2E6CC;
+  --bg:#FBF4E6; --card:#FFFDF7; --fg:#10202C; --muted:#5D6B72; --line:rgba(16,32,44,.14);
+  --band:#3F6873; --band-fg:#FAEFD7; --accent:#E8823A; --on-accent:#10202C; --mint:#3AE2A2; --field:#FFFFFF;
   --t-stand:#E8823A; --t-bf:#10202C; --t-leden:#3F6873; --t-open:#2BB07E;
   --display:"Archivo Black","Archivo",Arial,sans-serif;
   --head:"Bricolage Grotesque","Archivo",Arial,sans-serif;
   --body:"Archivo","Helvetica Neue",Arial,sans-serif;
   --mono:"Space Mono",ui-monospace,Menlo,monospace;
+  --gut:max(16px,env(safe-area-inset-left,0px));
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0F1D24; --card:#16272F; --fg:#FAEFD7; --muted:#A9B6BB; --line:rgba(250,239,215,.16);
-  --band:#16323B; --band-fg:#FAEFD7; --chip:#1F343D; --t-bf:#FAEFD7; --t-leden:#7FB3C0; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0F1D24; --card:#16272F; --fg:#FAEFD7; --muted:#A9B6BB; --line:rgba(250,239,215,.16);
-  --band:#16323B; --band-fg:#FAEFD7; --chip:#1F343D; --t-bf:#FAEFD7; --t-leden:#7FB3C0; color-scheme:dark}
-*{box-sizing:border-box}
-body{background:var(--bg);color:var(--fg);font:16px/1.5 var(--body);-webkit-font-smoothing:antialiased}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--band)}
-.wrap{max-width:1280px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-header{background:var(--band);color:var(--band-fg)}
-header .wrap{padding-block:28px 24px;display:flex;flex-wrap:wrap;gap:16px 32px;align-items:end;justify-content:space-between}
-.eyebrow{font:700 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;opacity:.85}
-h1{margin:8px 0 0;font:400 clamp(34px,7vw,64px)/.95 var(--display);text-transform:uppercase;text-wrap:balance}
-.stats{display:flex;gap:24px}
-.stats div{display:grid;gap:2px}
-.stats b{font:400 32px/1 var(--display);font-variant-numeric:tabular-nums}
-.stats span{font:400 12px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.06em;opacity:.85}
-nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
-nav .wrap{display:flex;gap:8px;overflow-x:auto;padding-block:12px;scrollbar-width:none;align-items:center}
-.tab{flex:none;font:700 13px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;padding:11px 16px;border-radius:999px;border:1.5px solid var(--fg);background:transparent;color:var(--fg);cursor:pointer}
-.tab[aria-selected="true"]{background:var(--fg);color:var(--bg)}
-.tab .n{opacity:.7;margin-left:6px}
-.spacer{flex:1}
-.ghost{flex:none;font:700 12px/1 var(--mono);text-transform:uppercase;letter-spacing:.04em;padding:10px 12px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--fg);cursor:pointer}
-main .wrap{padding-block:24px 160px;display:grid;gap:20px}
-.prompt{display:grid;gap:6px;max-width:70ch}
-.prompt h2{margin:0;font:800 clamp(24px,3.4vw,34px)/1.1 var(--head);text-wrap:balance}
-.prompt p{margin:0;color:var(--muted)}
-.hearts-left{font:700 13px/1.3 var(--mono);color:var(--muted)}
-.wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:14px;align-items:start}
-.idea{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:16px 16px 12px;display:grid;gap:12px;min-width:0;border-top:6px solid var(--tc,var(--accent))}
-.idea p{margin:0;font:600 18px/1.35 var(--body);overflow-wrap:anywhere;white-space:pre-wrap}
-.idea .meta{display:flex;align-items:center;justify-content:space-between;gap:8px;font:400 12px/1.3 var(--mono);color:var(--muted)}
-.idea .tag{font:700 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
-.idea.top{box-shadow:0 0 0 3px var(--mint)}
-.heart{display:inline-flex;align-items:center;gap:6px;font:700 15px/1 var(--mono);padding:8px 12px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--fg);cursor:pointer;font-variant-numeric:tabular-nums}
-.heart[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
-.heart:disabled{opacity:.45;cursor:default}
-.del{font:400 12px/1 var(--mono);background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:4px}
-.empty{border:2px dashed var(--line);border-radius:16px;padding:32px 20px;text-align:center;color:var(--muted);display:grid;gap:6px}
-.empty b{color:var(--fg);font:800 20px/1.2 var(--head)}
-form.add{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--band);color:var(--band-fg);padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
-form.add .wrap{padding-block:12px 0;display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:8px;align-items:end}
-form.add label{display:grid;gap:4px;font:700 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.06em;min-width:0}
-form.add input,form.add textarea,form.add select{font:16px/1.3 var(--body);padding:11px 12px;border-radius:12px;border:0;background:#FFFDF7;color:#10202C;width:100%;min-width:0}
-form.add textarea{resize:none;height:46px}
-.send{font:800 16px/1 var(--head);padding:14px 22px;border-radius:999px;border:0;background:var(--accent);color:var(--on-accent);cursor:pointer;height:46px}
-.status{font:400 12px/1.4 var(--mono);opacity:.85;min-height:1em;padding-top:6px}
-@media (max-width:640px){form.add .wrap{grid-template-columns:1fr auto}form.add .who{grid-column:1/-1}}
-:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-html.tv .idea p{font-size:26px}html.tv .wall{grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}html.tv form.add{display:none}html.tv main .wrap{padding-bottom:40px}
-@media (prefers-reduced-motion:no-preference){.idea{animation:in .25s ease-out}@keyframes in{from{transform:translateY(6px)}to{transform:none}}}
-.gate{position:fixed;inset:0;z-index:20;background:var(--band);color:var(--band-fg);display:grid;place-items:center;padding:24px}.gate h2{font:400 40px/1 var(--display);text-transform:uppercase;margin:0 0 8px}.gate form{display:flex;gap:8px;margin-top:16px}.gate input{font:16px var(--body);padding:12px;border-radius:12px;border:0;min-width:0;flex:1}
-</style>
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0F1D24; --card:#16272F; --fg:#FAEFD7; --muted:#A9B6BB; --line:rgba(250,239,215,.14);
+  --band:#16323B; --field:#0F1D24; --t-bf:#FAEFD7; --t-leden:#7FB3C0; color-scheme:dark}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:16px/1.45 var(--body);-webkit-font-smoothing:antialiased;min-height:100dvh}
+button{font:inherit;color:inherit}
+.wrap{max-width:1100px;margin:0 auto;padding-left:var(--gut);padding-right:max(16px,env(safe-area-inset-right,0px))}
 
-<div id="gate" class="gate" hidden><div><h2>Team code</h2><p>Scan the QR code in your playbook, or type the code.</p><form id="gateform"><input id="gatecode" autocomplete="off" placeholder="code"><button class="send" type="submit">Open</button></form></div></div>
-<header><div class="wrap">
-  <div><div class="eyebrow">Rejoes Fits · team night 12 Nov</div><h1>Ideas wall</h1></div>
-  <div class="stats"><div><b id="s-ideas">0</b><span>ideas</span></div><div><b id="s-hearts">0</b><span>hearts</span></div></div>
+/* top bar */
+.top{position:sticky;top:0;z-index:10;background:var(--band);color:var(--band-fg);padding-top:env(safe-area-inset-top,0px)}
+.top .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
+.brand{font:400 18px/1 var(--display);text-transform:uppercase;letter-spacing:.01em;white-space:nowrap}
+.brand small{display:block;font:700 10px/1.4 var(--mono);letter-spacing:.08em;opacity:.8}
+.seg{margin-left:auto;display:flex;background:rgba(0,0,0,.18);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;color:var(--band-fg);font:700 13px/1 var(--mono);text-transform:uppercase;letter-spacing:.03em;padding:11px 14px;border-radius:999px;cursor:pointer;min-height:40px}
+.seg button[aria-selected="true"]{background:var(--band-fg);color:#10202C}
+
+/* wall */
+.chips{position:sticky;top:calc(60px + env(safe-area-inset-top,0px));z-index:9;background:var(--bg);border-bottom:1px solid var(--line)}
+.chips .wrap{display:flex;gap:8px;overflow-x:auto;padding-block:10px;scrollbar-width:none}
+.chips .wrap::-webkit-scrollbar{display:none}
+.chip{flex:none;font:700 13px/1 var(--mono);text-transform:uppercase;letter-spacing:.03em;padding:11px 14px;min-height:42px;border-radius:999px;border:1.5px solid var(--fg);background:transparent;cursor:pointer}
+.chip[aria-selected="true"]{background:var(--fg);color:var(--bg)}
+.chip .n{opacity:.65;margin-left:6px}
+.wallmain{padding-block:16px calc(120px + env(safe-area-inset-bottom,0px));display:grid;gap:14px}
+.prompt h2{margin:0;font:800 24px/1.1 var(--head);text-wrap:balance}
+.prompt p{margin:6px 0 0;color:var(--muted);font-size:15px}
+.pill{display:inline-block;margin-top:8px;font:700 12px/1 var(--mono);padding:7px 10px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
+.wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px;align-items:start}
+.idea{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--tc,var(--accent));border-radius:14px;padding:14px 14px 10px;display:grid;gap:10px;min-width:0}
+.idea p{margin:0;font:600 17px/1.35 var(--body);overflow-wrap:anywhere;white-space:pre-wrap}
+.idea.top{box-shadow:0 0 0 3px var(--mint)}
+.meta{display:flex;align-items:center;gap:8px;font:400 12px/1.3 var(--mono);color:var(--muted)}
+.meta .who{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.heart{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:700 16px/1 var(--mono);min-width:64px;min-height:44px;padding:0 14px;border-radius:999px;border:1.5px solid var(--line);background:transparent;cursor:pointer;font-variant-numeric:tabular-nums}
+.heart[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.heart:disabled{opacity:.4}
+.del{background:none;border:0;color:var(--muted);font:400 12px/1 var(--mono);text-decoration:underline;min-height:44px;padding:0 6px;cursor:pointer}
+.empty{border:2px dashed var(--line);border-radius:14px;padding:28px 18px;text-align:center;color:var(--muted)}
+.empty b{display:block;color:var(--fg);font:800 19px/1.2 var(--head);margin-bottom:4px}
+
+.composer{position:fixed;left:0;right:0;bottom:0;z-index:11;background:var(--band);color:var(--band-fg);padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+.composer .wrap{padding-block:10px 0;display:flex;gap:8px;align-items:flex-end}
+.composer textarea{flex:1;min-width:0;font:16px/1.35 var(--body);padding:12px 14px;border-radius:22px;border:0;background:#FFFDF7;color:#10202C;resize:none;max-height:140px;min-height:46px}
+.send{flex:none;font:800 16px/1 var(--head);min-height:46px;padding:0 20px;border-radius:999px;border:0;background:var(--accent);color:var(--on-accent);cursor:pointer}
+.as{font:400 12px/1.3 var(--mono);opacity:.85;padding-top:6px;display:flex;gap:8px;align-items:center}
+.as button{background:none;border:0;color:inherit;text-decoration:underline;padding:6px 0;cursor:pointer;font:inherit}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(130px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--fg);color:var(--bg);font:600 14px/1.3 var(--body);padding:10px 16px;border-radius:999px;max-width:calc(100% - 32px);text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+
+/* playbook */
+.pb{padding-block:16px calc(40px + env(safe-area-inset-bottom,0px));display:grid;gap:14px}
+.intro{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.intro h2{margin:0 0 8px;font:800 22px/1.1 var(--head)}
+.steps{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(min-width:700px){.steps{grid-template-columns:repeat(4,1fr)}}
+.steps div{font-size:14px;line-height:1.3}
+.steps b{display:block;font:700 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--band)}
+@media (prefers-color-scheme:dark){.steps b{color:#7FB3C0}}
+.saved{font:400 12px/1.3 var(--mono);color:var(--muted)}
+details.play{background:var(--card);border:1px solid var(--line);border-top:6px solid var(--tc);border-radius:14px;overflow:hidden}
+details.play summary{list-style:none;cursor:pointer;padding:14px;display:flex;align-items:center;gap:10px;min-height:56px}
+details.play summary::-webkit-details-marker{display:none}
+summary .t{flex:1;min-width:0}
+summary .t small{display:block;font:700 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+summary .t b{font:800 19px/1.15 var(--head)}
+summary .count{font:700 12px/1 var(--mono);color:var(--muted);white-space:nowrap}
+summary .chev{transition:transform .2s;font-size:18px}
+details[open] summary .chev{transform:rotate(180deg)}
+.body{padding:0 14px 16px;display:grid;gap:14px}
+.tool{background:var(--fg);color:var(--bg);border-radius:12px;padding:12px 14px}
+.tool small{display:block;font:700 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
+.tool b{font:800 17px/1.25 var(--head)}
+.tool span{display:block;font:400 12px/1.4 var(--mono);margin-top:4px;opacity:.9}
+.grp{font:700 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:-6px}
+.f{display:grid;gap:6px}
+.f label{font:700 15px/1.3 var(--body)}
+.f .hint{font-size:13px;color:var(--muted);margin-top:-4px}
+.f textarea{font:16px/1.4 var(--body);padding:12px;border-radius:12px;border:1.5px solid var(--line);background:var(--field);color:var(--fg);resize:none;min-height:52px;width:100%}
+.f textarea:focus{outline:none;border-color:var(--accent)}
+.f .fixed{font:700 14px/1.4 var(--mono);padding:10px 12px;border-radius:12px;background:var(--bg);border:1px dashed var(--line)}
+.post{justify-self:start;font:700 12px/1 var(--mono);text-transform:uppercase;letter-spacing:.04em;min-height:40px;padding:0 14px;border-radius:999px;border:1.5px solid var(--fg);background:transparent;cursor:pointer}
+.post.done{background:var(--mint);border-color:var(--mint);color:#10202C}
+.post:disabled{opacity:.35}
+.pair{display:grid;gap:8px;padding:12px;border:1px solid var(--line);border-radius:12px}
+.done-when{font-size:14px;border-top:1.5px solid var(--fg);padding-top:10px}
+.done-when b{font:700 11px var(--mono);letter-spacing:.06em;margin-right:6px}
+
+/* gate */
+.gate{position:fixed;inset:0;z-index:40;background:var(--band);color:var(--band-fg);display:grid;place-items:center;padding:24px max(24px,env(safe-area-inset-left,0px))}
+.gate .box{width:min(420px,100%);display:grid;gap:12px}
+.gate h1{margin:0;font:400 40px/.95 var(--display);text-transform:uppercase}
+.gate p{margin:0;opacity:.9}
+.gate input{font:18px/1.3 var(--body);padding:14px 16px;border-radius:14px;border:0;width:100%;background:#FFFDF7;color:#10202C}
+.gate .send{min-height:52px;width:100%}
+.gate .err{font:400 13px/1.3 var(--mono);color:#FFD2B0;min-height:1em}
+
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+html.tv .composer,html.tv .seg,html.tv .pill{display:none}
+html.tv .idea p{font-size:26px}html.tv .wall{grid-template-columns:repeat(auto-fill,minmax(360px,1fr))}html.tv .wallmain{padding-bottom:32px}
+html.tv .prompt h2{font-size:36px}
+</style></head>
+<body>
+
+<div class="gate" id="gate" hidden><form class="box" id="gateform" autocomplete="off">
+  <h1>Fits<br>team night</h1>
+  <p id="gate-text">What’s your name? Your team sees it on your ideas.</p>
+  <input id="g-code" placeholder="Team code" autocapitalize="off" hidden>
+  <input id="g-name" placeholder="Your first name" maxlength="30" autocomplete="given-name">
+  <button class="send" type="submit">Let’s go</button>
+  <div class="err" id="g-err"></div>
+</form></div>
+
+<header class="top"><div class="wrap">
+  <div class="brand">Fits<small>Team night · 12 Nov</small></div>
+  <div class="seg" role="tablist">
+    <button role="tab" id="tab-wall" aria-selected="true">Wall</button>
+    <button role="tab" id="tab-pb" aria-selected="false">My playbook</button>
+  </div>
 </div></header>
 
-<nav aria-label="Plays"><div class="wrap" role="tablist" id="tabs"></div></nav>
+<section id="v-wall">
+  <nav class="chips" aria-label="Plays"><div class="wrap" id="chips"></div></nav>
+  <main class="wrap wallmain">
+    <div class="prompt"><h2 id="p-title"></h2><p id="p-text"></p><span class="pill" id="hearts-left"></span></div>
+    <div class="wall" id="wall" aria-live="polite"></div>
+  </main>
+  <form class="composer" id="add" autocomplete="off"><div class="wrap">
+    <textarea id="idea" rows="1" maxlength="280" placeholder="One idea, one sentence" enterkeyhint="send"></textarea>
+    <button class="send" type="submit">Post</button>
+  </div><div class="wrap as"><span id="as-who"></span><button type="button" id="rename">change name</button></div></form>
+</section>
 
-<main><div class="wrap">
-  <div class="prompt"><h2 id="p-title"></h2><p id="p-text"></p><div class="hearts-left" id="hearts-left"></div></div>
-  <div class="wall" id="wall" aria-live="polite"></div>
-</div></main>
+<section id="v-pb" hidden>
+  <main class="wrap pb" id="pb"></main>
+</section>
 
-<form class="add" id="add" autocomplete="off"><div class="wrap">
-  <label class="who" for="who">Your name<input id="who" maxlength="30" placeholder="e.g. Sara"></label>
-  <label for="idea">Your idea<textarea id="idea" maxlength="280" placeholder="One idea, one sentence" required></textarea></label>
-  <button class="send" type="submit">Post</button>
-</div><div class="wrap"><div class="status" id="status"></div></div></form>
+<div class="toast" id="toast" hidden></div>
 
 <script>
-const THEMES=[
-  {id:"stand",label:"1 · In store",color:"var(--t-stand)",title:"Play 1 · More yeses in the store",text:"Your best opening line. The objection you hear most and the answer that works. How you prove Fits works. What makes signing up on the spot easier."},
-  {id:"bf",label:"2 · Black Friday",color:"var(--t-bf)",title:"Play 2 · Black Friday, 27 Nov to 1 Dec",text:"A bonus that costs us little and feels big. A name for the deal. How we make the deadline real. How we reach shoppers in the store, online, and the 356 accounts without a pass."},
-  {id:"leden",label:"3 · Members",color:"var(--t-leden)",title:"Play 3 · Members who stay and bring a friend",text:"When does a new member think “this is great”? How do we get them there in week one? When do we ask who they’re bringing?"},
-  {id:"open",label:"Open floor",color:"var(--t-open)",title:"Open floor · what did we forget to ask?",text:"Anything goes. What should we start, stop or keep? What do customers tell you? What annoys you in the store?"}
-];
-const HEARTS_PER_THEME=3;
-const $=id=>document.getElementById(id);
-let theme="stand", ideas=[], votes=[], db=null, me=null;
-function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
-let localKey=store("fits-voter"); if(!localKey){localKey="v"+Math.random().toString(36).slice(2,10);store("fits-voter",localKey)}
-$("who").value=store("fits-name")||"";
-if(location.hash==="#tv")document.documentElement.classList.add("tv");
-const hashTheme=THEMES.find(t=>"#"+t.id===location.hash); if(hashTheme)theme=hashTheme.id;
-
-function renderTabs(){
-  const t=$("tabs"); t.innerHTML="";
-  THEMES.forEach(th=>{const b=document.createElement("button");b.className="tab";b.type="button";b.setAttribute("role","tab");b.setAttribute("aria-selected",th.id===theme);
-    b.textContent=th.label;const n=document.createElement("span");n.className="n";n.textContent=ideas.filter(i=>i.theme===th.id).length;b.append(n);
-    b.onclick=()=>{theme=th.id;render()};t.append(b)});
-  const sp=document.createElement("div");sp.className="spacer";t.append(sp);
-  const tv=document.createElement("button");tv.className="ghost";tv.type="button";tv.id="tvbtn";
-  tv.textContent=document.documentElement.classList.contains("tv")?"Phone view":"Big screen";
-  tv.onclick=()=>{document.documentElement.classList.toggle("tv");render()};t.append(tv);
-}
-function voteCount(id){return votes.filter(v=>v.ideaId===id).length}
-function myVote(id){return votes.find(v=>v.ideaId===id&&v.voter===voterId())}
-function voterId(){return me||localKey}
-function myHeartsIn(th){const ids=new Set(ideas.filter(i=>i.theme===th).map(i=>i.id));return votes.filter(v=>v.voter===voterId()&&ids.has(v.ideaId)).length}
-function render(){
-  renderTabs();
-  const th=THEMES.find(t=>t.id===theme);
-  $("p-title").textContent=th.title;$("p-text").textContent=th.text;
-  const left=HEARTS_PER_THEME-myHeartsIn(theme);
-  $("hearts-left").textContent=`You have ${left} of ${HEARTS_PER_THEME} hearts left in this play.`;
-  $("s-ideas").textContent=ideas.length;$("s-hearts").textContent=votes.length;
-  const list=ideas.filter(i=>i.theme===theme).map(i=>({...i,n:voteCount(i.id)})).sort((a,b)=>b.n-a.n||(a.createdAt||0)-(b.createdAt||0));
-  const wall=$("wall");wall.innerHTML="";
-  if(!list.length){wall.innerHTML=`<div class="empty"><b>No ideas here yet</b><span>${db?"Type your first idea below and tap Post.":"Connecting…"}</span></div>`;return}
-  const topN=list[0].n>0?list.filter(x=>x.n>0).slice(0,3).map(x=>x.id):[];
-  list.forEach(i=>{
-    const el=document.createElement("article");el.className="idea"+(topN.includes(i.id)?" top":"");el.style.setProperty("--tc",th.color);
-    const p=document.createElement("p");p.textContent=i.text;
-    const meta=document.createElement("div");meta.className="meta";
-    const who=document.createElement("span");who.textContent=(i.name||"Anonymous")+(topN.includes(i.id)?" · top 3":"");
-    const right=document.createElement("span");right.style.display="flex";right.style.gap="6px";right.style.alignItems="center";
-    if(i.author===voterId()){const d=document.createElement("button");d.className="del";d.type="button";d.textContent="Delete";d.onclick=()=>removeIdea(i.id);right.append(d)}
-    const h=document.createElement("button");h.className="heart";h.type="button";const mine=!!myVote(i.id);
-    h.setAttribute("aria-pressed",mine);h.setAttribute("aria-label",(mine?"Remove heart":"Give heart")+", "+i.n+" hearts");
-    h.textContent="♡ "+i.n;h.disabled=!db||(!mine&&left<=0);h.onclick=()=>toggleVote(i.id);right.append(h);
-    meta.append(who,right);el.append(p,meta);wall.append(el)});
-}
-function say(t){$("status").textContent=t}
 const API="https://hwiezxqtmjwudnqdmaql.supabase.co/rest/v1/rpc/";
 const KEY="sb_publishable_mVROxEEmhTrWV3OdRJAAAQ_KTCX6Muz";
+const THEMES=[
+  {id:"stand",label:"1 · In store",color:"var(--t-stand)",title:"More yeses in the store",text:"Your best opening line, the objection you hear most and the answer that works."},
+  {id:"bf",label:"2 · Black Friday",color:"var(--t-bf)",title:"Black Friday: 27 Nov to 1 Dec",text:"A bonus that costs us little and feels big. A name for the deal. How we make the deadline real."},
+  {id:"leden",label:"3 · Members",color:"var(--t-leden)",title:"Members who stay, and bring a friend",text:"How a new member gets a first win in week one, and when we ask who they’re bringing."},
+  {id:"open",label:"Open floor",color:"var(--t-open)",title:"What did we forget to ask?",text:"Anything goes. Start, stop, keep, or what customers tell you."}
+];
+// Digital playbook: same questions as the printed one. post = theme it can be posted to.
+const PLAYBOOK=[
+  {id:"p1",theme:"stand",kicker:"Play 1",title:"More yeses in the store",tool:["The value equation","(Dream outcome × Likelihood) ÷ (Time × Effort)"],items:[
+    {g:"A · The three objections you hear most"},
+    {pair:[["o1s","What the customer says","e.g. “It’s too expensive.”"],["o1a","What I say back that works"]]},
+    {pair:[["o2s","What the customer says"],["o2a","What I say back that works"]]},
+    {pair:[["o3s","What the customer says"],["o3a","What I say back that works"]]},
+    {g:"B · Opening"},
+    {k:"open",l:"My best opening line in the store",post:"Opening line"},
+    {g:"C · One idea per lever"},
+    {k:"dream",l:"Dream outcome ↑",h:"What does the customer want? Say it in one line.",post:"Dream outcome"},
+    {k:"likely",l:"Likelihood ↑",h:"How do you prove it works? What takes the risk away?",post:"Likelihood"},
+    {k:"time",l:"Time ↓",h:"How does someone get something from Fits today?",post:"Time"},
+    {k:"effort",l:"Effort ↓",h:"What makes signing up on the spot easier?",post:"Effort"}],
+   done:"We have the best answer to the three objections you hear most."},
+  {id:"p2",theme:"bf",kicker:"Play 2",title:"Black Friday: 27 Nov to 1 Dec",tool:["Add value, keep the price","Bonus · Name · Deadline"],items:[
+    {g:"A · Build the offer"},
+    {k:"name",l:"Name",h:"What do we call the deal? Make it sound “sexy”.",post:"Name"},
+    {k:"bonus",l:"Bonus",h:"Costs us little, feels big.",post:"Bonus"},
+    {fixed:"Deadline",v:"Mon 1 Dec, 23:59. How do people feel that clock?"},
+    {k:"deadline",l:"How we make the deadline felt",post:"Deadline"},
+    {g:"B · The whole offer"},
+    {k:"sentence",l:"The offer in one sentence, the way you’d say it on the floor",post:"Offer"}],
+   done:"One Black Friday offer in one sentence, plus a plan for the store floor that weekend."},
+  {id:"p3",theme:"leden",kicker:"Play 3",title:"Members who stay, and bring a friend",tool:["Fast first win, ask at the peak",""],items:[
+    {g:"A · A new member’s first 7 days"},
+    {k:"d0",l:"Day 0 · signs up in the store",h:"What happens, and who does it?"},
+    {k:"d1",l:"Day 1"},{k:"d3",l:"Day 3"},{k:"d7",l:"Day 7 · first outfit picked up?"},
+    {g:"B · Staying active"},
+    {k:"active",l:"Members who cancel mostly say they didn’t use it enough. How do we keep them using it?",post:"Staying active"},
+    {g:"C · The ask"},
+    {k:"happy",l:"A member is happiest when…",post:"Happiest when"},
+    {k:"ask",l:"My sentence to ask: “who are you bringing?”",post:"The ask"}],
+   done:"One first-week routine, and one sentence to ask for a friend."},
+  {id:"open",theme:"open",kicker:"Open floor",title:"What did we forget to ask?",items:[
+    {k:"start",l:"Start · what should we start doing?",post:"Start"},
+    {k:"stop",l:"Stop · what should we stop doing?",post:"Stop"},
+    {k:"keep",l:"Keep · what works and has to stay?",post:"Keep"},
+    {k:"cust",l:"Something customers tell me that we should hear",post:"Customers say"}]},
+  {id:"end",theme:null,kicker:"Last round",title:"One thing I’ll do differently tomorrow",items:[
+    {k:"tomorrow",l:"Tomorrow I will…"},
+    {g:"Team challenge · the reward I want"},
+    {k:"r_week",l:"Every record week",h:"25+ new members"},
+    {k:"r_mile",l:"Every milestone",h:"200, 300, 500"},
+    {k:"r_1000",l:"1000 on 31 December",h:"The big one"},
+    {k:"else",l:"Anything else you want us to know?"}]}
+];
+
+const $=id=>document.getElementById(id);
+function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+let author=store("fits-voter"); if(!author){author="v"+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);store("fits-voter",author)}
 const qs=new URLSearchParams(location.search);
 let code=qs.get("c")||store("fits-code")||"";
+let myName=store("fits-name")||"";
+let theme="stand", ideas=[], votes=[], online=false, view="wall";
+let answers={}; try{answers=JSON.parse(store("fits-pb")||"{}")}catch(e){answers={}}
+let posted={}; try{posted=JSON.parse(store("fits-posted")||"{}")}catch(e){posted={}}
+if(qs.has("c"))history.replaceState(null,"",location.pathname+location.hash);
+if(location.hash==="#tv")document.documentElement.classList.add("tv");
+if(location.hash==="#playbook")view="pb";
+
 async function rpc(fn,args){
-  const r=await fetch(API+fn,{method:"POST",headers:{"apikey":KEY,"Authorization":"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({p_code:code,...args})});
+  const r=await fetch(API+fn,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({p_code:code,...args})});
   const t=await r.text(); if(!r.ok){let m="";try{m=JSON.parse(t).message}catch(e){} throw new Error(m||("HTTP "+r.status))}
   return t?JSON.parse(t):null;
 }
-async function load(){
-  try{const d=await rpc("team_wall_list",{});ideas=d.ideas;votes=d.votes;db=true;store("fits-code",code);$("gate").hidden=true;render()}
-  catch(e){ if(/bad code/.test(e.message)){db=null;$("gate").hidden=false} else say("Can’t reach the wall. Check your connection.") }
+let toastT; function toast(t){const el=$("toast");el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,2600)}
+
+/* ---------- gate ---------- */
+function openGate(needCode){
+  $("g-code").hidden=!needCode; $("g-name").value=myName;
+  $("gate-text").textContent=needCode?"Scan the QR in your playbook, or type the team code.":"What’s your name? Your team sees it on your ideas.";
+  $("gate").hidden=false; setTimeout(()=>(needCode?$("g-code"):$("g-name")).focus(),50);
+}
+$("gateform").addEventListener("submit",async e=>{
+  e.preventDefault(); $("g-err").textContent="";
+  if(!$("g-code").hidden){code=$("g-code").value.trim().toLowerCase()}
+  const n=$("g-name").value.trim(); if(!n){$("g-err").textContent="Type your name first.";return}
+  try{await load(true)}catch(err){$("g-err").textContent=/bad code/.test(err.message)?"That code doesn’t work.":"Can’t reach the wall. Check your connection.";return}
+  myName=n;store("fits-name",n);store("fits-code",code);$("gate").hidden=true;renderAll();pullPlaybook();
+});
+$("rename").onclick=()=>openGate(false);
+
+/* ---------- views ---------- */
+function setView(v){view=v;$("v-wall").hidden=v!=="wall";$("v-pb").hidden=v!=="pb";
+  $("tab-wall").setAttribute("aria-selected",v==="wall");$("tab-pb").setAttribute("aria-selected",v==="pb");
+  history.replaceState(null,"",location.pathname+(v==="pb"?"#playbook":""));window.scrollTo(0,0);if(v==="pb")renderPlaybook()}
+$("tab-wall").onclick=()=>setView("wall");$("tab-pb").onclick=()=>setView("pb");
+
+/* ---------- wall ---------- */
+const HEARTS=3;
+const voteCount=id=>votes.filter(v=>v.ideaId===id).length;
+const myVote=id=>votes.some(v=>v.ideaId===id&&v.voter===author);
+function myHeartsIn(th){const ids=new Set(ideas.filter(i=>i.theme===th).map(i=>i.id));return votes.filter(v=>v.voter===author&&ids.has(v.ideaId)).length}
+function renderChips(){
+  const c=$("chips");c.innerHTML="";
+  THEMES.forEach(th=>{const b=document.createElement("button");b.className="chip";b.type="button";b.setAttribute("aria-selected",th.id===theme);
+    b.textContent=th.label;const n=document.createElement("span");n.className="n";n.textContent=ideas.filter(i=>i.theme===th.id).length;b.append(n);
+    b.onclick=()=>{theme=th.id;renderWall();b.scrollIntoView({inline:"center",block:"nearest",behavior:"smooth"})};c.append(b)});
+}
+function renderWall(){
+  renderChips();
+  const th=THEMES.find(t=>t.id===theme);
+  $("p-title").textContent=th.title;$("p-text").textContent=th.text;
+  const left=HEARTS-myHeartsIn(theme);$("hearts-left").textContent=`♡ ${left} of ${HEARTS} hearts left`;
+  $("as-who").textContent=myName?"Posting as "+myName+" in "+th.label:"";
+  $("idea").placeholder="Your idea for "+th.label.replace(/^\d · /,"");
+  const list=ideas.filter(i=>i.theme===theme).map(i=>({...i,n:voteCount(i.id)})).sort((a,b)=>b.n-a.n||a.createdAt-b.createdAt);
+  const wall=$("wall");wall.innerHTML="";
+  if(!list.length){wall.innerHTML=`<div class="empty"><b>No ideas here yet</b>${online?"Be the first. Type below and tap Post.":"Connecting…"}</div>`;return}
+  const top=list[0].n>0?list.filter(x=>x.n>0).slice(0,3).map(x=>x.id):[];
+  list.forEach(i=>{
+    const el=document.createElement("article");el.className="idea"+(top.includes(i.id)?" top":"");el.style.setProperty("--tc",th.color);
+    const p=document.createElement("p");p.textContent=i.text;
+    const meta=document.createElement("div");meta.className="meta";
+    const who=document.createElement("span");who.className="who";who.textContent=(i.name||"Anonymous")+(top.includes(i.id)?" · top 3":"");meta.append(who);
+    if(i.author===author){const d=document.createElement("button");d.className="del";d.type="button";d.textContent="Delete";d.onclick=()=>removeIdea(i.id);meta.append(d)}
+    const mine=myVote(i.id);const h=document.createElement("button");h.className="heart";h.type="button";
+    h.setAttribute("aria-pressed",mine);h.setAttribute("aria-label",(mine?"Take back heart":"Give heart")+", "+i.n);
+    h.textContent=(mine?"♥ ":"♡ ")+i.n;h.disabled=!online||(!mine&&left<=0);h.onclick=()=>toggleVote(i.id);meta.append(h);
+    el.append(p,meta);wall.append(el)});
+}
+let loading=false;
+async function load(strict){
+  if(loading&&!strict)return; loading=true;
+  try{const d=await rpc("team_wall_list",{});ideas=d.ideas;votes=d.votes;online=true;if(view==="wall")renderWall();else renderChips()}
+  catch(e){if(strict)throw e;if(/bad code/.test(e.message))openGate(true)}
+  finally{loading=false}
 }
 async function toggleVote(id){
-  try{await rpc("team_wall_vote",{p_idea:id,p_voter:voterId()});await load()}
-  catch(e){say(/no hearts/.test(e.message)?"You used your 3 hearts in this play. Take one back first.":"Your heart didn’t go through. Try again.")}
+  // optimistic
+  const had=myVote(id);votes=had?votes.filter(v=>!(v.ideaId===id&&v.voter===author)):[...votes,{ideaId:id,voter:author}];renderWall();
+  try{await rpc("team_wall_vote",{p_idea:id,p_voter:author})}
+  catch(e){toast(/no hearts/.test(e.message)?"Your 3 hearts are used. Take one back first.":"That didn’t go through. Try again.")}
+  load();
 }
-async function removeIdea(id){
-  try{await rpc("team_wall_delete",{p_idea:id,p_author:voterId()});await load()}catch(e){say("Couldn’t delete that.")}
+async function removeIdea(id){try{await rpc("team_wall_delete",{p_idea:id,p_author:author});ideas=ideas.filter(i=>i.id!==id);renderWall()}catch(e){toast("Couldn’t delete that.")}}
+async function postIdea(th,text){
+  await rpc("team_wall_add",{p_theme:th,p_text:text,p_name:myName,p_author:author});
+  await load();
 }
+const ta=$("idea");
+function grow(el){el.style.height="auto";el.style.height=Math.min(el.scrollHeight+2,el.classList.contains("pbf")?600:140)+"px"}
+ta.addEventListener("input",()=>grow(ta));
 $("add").addEventListener("submit",async e=>{
-  e.preventDefault();
-  const text=$("idea").value.trim(), name=$("who").value.trim();
-  if(!text)return;
-  if(!db){say("The wall isn’t connected yet. Wait a moment and try again.");return}
-  store("fits-name",name);
-  try{await rpc("team_wall_add",{p_theme:theme,p_text:text,p_name:name,p_author:voterId()});$("idea").value="";say("Posted in “"+THEMES.find(t=>t.id===theme).label+"”.");await load()}
-  catch(err){say(/wall full/.test(err.message)?"The wall is full.":"Couldn’t post. Try again.")}
+  e.preventDefault();const text=ta.value.trim();if(!text)return;
+  if(!myName){openGate(false);return}
+  try{await postIdea(theme,text);ta.value="";grow(ta);ta.blur();toast("Posted ✓")}
+  catch(err){toast(/wall full/.test(err.message)?"The wall is full.":"Couldn’t post. Try again.")}
 });
-$("idea").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();$("add").requestSubmit()}});
-$("gateform").addEventListener("submit",e=>{e.preventDefault();code=$("gatecode").value.trim().toLowerCase();load()});
-if(qs.has("c"))history.replaceState(null,"",location.pathname+location.hash);
-render();
-if(code)load();else $("gate").hidden=false;
-setInterval(()=>{if(db&&!document.hidden)load()},3000);
-document.addEventListener("visibilitychange",()=>{if(!document.hidden&&db)load()});
-</script>
 
+/* ---------- playbook ---------- */
+let saveT,saving=false;
+function filled(sec){return sec.items.flatMap(it=>it.pair?it.pair.map(p=>p[0]):it.k?[it.k]:[]).map(k=>sec.id+"."+k)}
+function renderPlaybook(){
+  const root=$("pb");root.innerHTML="";
+  const intro=document.createElement("div");intro.className="intro";
+  intro.innerHTML=`<h2>Every play runs the same way</h2><div class="steps">
+    <div><b>1 · Read</b>I explain the goal and the tool.</div>
+    <div><b>2 · Write</b>Alone and quiet, here. Three ideas minimum.</div>
+    <div><b>3 · Share</b>Read your best ones out loud.</div>
+    <div><b>4 · Post + vote</b>Tap “Post to wall” on your best idea.</div></div>
+    <p class="saved" id="saved" style="margin:10px 0 0">Your answers save on this phone and go to Yassin automatically.</p>`;
+  root.append(intro);
+  const openId=store("fits-open")||"p1";
+  PLAYBOOK.forEach(sec=>{
+    const th=THEMES.find(t=>t.id===sec.theme);
+    const d=document.createElement("details");d.className="play";d.style.setProperty("--tc",th?th.color:"var(--accent)");d.open=sec.id===openId;
+    d.addEventListener("toggle",()=>{if(d.open){store("fits-open",sec.id);root.querySelectorAll("details.play").forEach(o=>{if(o!==d)o.open=false});setTimeout(()=>d.scrollIntoView({block:"start",behavior:"smooth"}),30)}});
+    const keys=filled(sec);const n=keys.filter(k=>(answers[k]||"").trim()).length;
+    const s=document.createElement("summary");s.innerHTML=`<span class="t"><small></small><b></b></span><span class="count">${n}/${keys.length}</span><span class="chev">⌄</span>`;
+    s.querySelector("small").textContent=sec.kicker;s.querySelector("b").textContent=sec.title;d.append(s);
+    const body=document.createElement("div");body.className="body";
+    if(sec.tool){const t=document.createElement("div");t.className="tool";t.innerHTML="<small>The tool</small><b></b><span></span>";t.querySelector("b").textContent=sec.tool[0];t.querySelector("span").textContent=sec.tool[1];if(!sec.tool[1])t.querySelector("span").remove();body.append(t)}
+    sec.items.forEach(it=>{
+      if(it.g){const g=document.createElement("div");g.className="grp";g.textContent=it.g;body.append(g);return}
+      if(it.fixed){const f=document.createElement("div");f.className="f";f.innerHTML="<label></label><div class='fixed'></div>";f.querySelector("label").textContent=it.fixed;f.querySelector(".fixed").textContent=it.v;body.append(f);return}
+      if(it.pair){const box=document.createElement("div");box.className="pair";
+        it.pair.forEach(p=>box.append(field(sec,{k:p[0],l:p[1],ph:p[2]})));
+        const btn=postBtn(sec,"pair:"+it.pair[0][0],()=>{const a=(answers[sec.id+"."+it.pair[0][0]]||"").trim(),b=(answers[sec.id+"."+it.pair[1][0]]||"").trim();return a&&b?`“${a}” → ${b}`:""});
+        box.append(btn);body.append(box);return}
+      const f=field(sec,it);
+      if(it.post&&sec.theme)f.append(postBtn(sec,it.k,()=>{const v=(answers[sec.id+"."+it.k]||"").trim();return v?it.post+": "+v:""}));
+      body.append(f);
+    });
+    if(sec.done){const dw=document.createElement("div");dw.className="done-when";dw.innerHTML="<b>DONE WHEN</b>";dw.append(sec.done);body.append(dw)}
+    d.append(body);root.append(d);
+  });
+  root.querySelectorAll("textarea.pbf").forEach(grow);
+}
+function field(sec,it){
+  const key=sec.id+"."+it.k;const f=document.createElement("div");f.className="f";
+  const id="f_"+key.replace(".","_");
+  const l=document.createElement("label");l.htmlFor=id;l.textContent=it.l;f.append(l);
+  if(it.h){const h=document.createElement("div");h.className="hint";h.textContent=it.h;f.append(h)}
+  const t=document.createElement("textarea");t.className="pbf";t.id=id;t.rows=1;t.maxLength=600;t.value=answers[key]||"";if(it.ph)t.placeholder=it.ph;
+  t.addEventListener("input",()=>{answers[key]=t.value;grow(t);persist();f.querySelectorAll(".post").forEach(b=>b.dispatchEvent(new Event("refresh")))});
+  f.append(t);return f;
+}
+function postBtn(sec,k,getText){
+  const pk=sec.id+"."+k;const b=document.createElement("button");b.type="button";b.className="post";
+  const upd=()=>{const txt=getText();const done=posted[pk]&&posted[pk]===txt;b.classList.toggle("done",!!done);b.textContent=done?"On the wall ✓":"Post to wall →";b.disabled=!txt||done};
+  b.addEventListener("refresh",upd);upd();
+  b.onclick=async()=>{const txt=getText();if(!txt)return;if(!myName){openGate(false);return}
+    b.disabled=true;try{await postIdea(sec.theme,txt.slice(0,280));posted[pk]=txt;store("fits-posted",JSON.stringify(posted));upd();toast("Posted in “"+THEMES.find(t=>t.id===sec.theme).label+"” ✓")}
+    catch(e){b.disabled=false;toast("Couldn’t post. Try again.")}};
+  return b;
+}
+function persist(){
+  store("fits-pb",JSON.stringify(answers));
+  const s=$("saved");if(s)s.textContent="Saving…";
+  clearTimeout(saveT);saveT=setTimeout(pushPlaybook,900);
+}
+async function pushPlaybook(){
+  if(!online&&!code)return;
+  try{await rpc("team_playbook_save",{p_author:author,p_name:myName,p_answers:answers});const s=$("saved");if(s)s.textContent="Saved ✓ · Yassin sees your answers"}
+  catch(e){const s=$("saved");if(s)s.textContent="Saved on this phone. Sending again when you’re online."}
+}
+async function pullPlaybook(){
+  try{const d=await rpc("team_playbook_get",{p_author:author});
+    if(d&&d.answers){let changed=false;for(const k in d.answers){if(!answers[k]&&d.answers[k]){answers[k]=d.answers[k];changed=true}}
+      if(changed){store("fits-pb",JSON.stringify(answers));if(view==="pb")renderPlaybook()}}}catch(e){}
+}
+window.addEventListener("online",pushPlaybook);
+
+/* ---------- start ---------- */
+function renderAll(){renderWall();if(view==="pb")renderPlaybook()}
+setView(view);renderAll();
+if(!code)openGate(true);
+else{load(true).then(()=>{if(!myName)openGate(false);pullPlaybook()}).catch(e=>{if(/bad code/.test(e.message))openGate(true);else toast("Can’t reach the wall. Check your connection.")})}
+setInterval(()=>{if(code&&!document.hidden)load()},3000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&code)load()});
+</script>
 </body></html>
