@@ -116,7 +116,9 @@ details[open] summary .chev{transform:rotate(180deg)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 html.tv .composer,html.tv .seg,html.tv .pill{display:none}
 html.tv .idea p{font-size:26px}html.tv .wall{grid-template-columns:repeat(auto-fill,minmax(360px,1fr))}html.tv .wallmain{padding-bottom:32px}
-html.tv .prompt h2{font-size:36px}
+html.tv .prompt h2{font-size:44px}html.tv .prompt p{font-size:20px}html.tv .chip{font-size:16px}html.tv .wallmain{padding-right:260px}
+.tvqr{display:none}html.tv .tvqr{display:grid;gap:10px;justify-items:center;position:fixed;right:24px;bottom:24px;z-index:12;background:#FFFDF7;color:#10202C;border-radius:18px;padding:16px;font:700 16px/1.2 var(--mono);text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.25)}html.tv .tvqr img{width:200px;height:200px}
+@media(max-width:900px){html.tv .tvqr{display:none}html.tv .wallmain{padding-right:0}}
 </style></head>
 <body>
 
@@ -153,6 +155,7 @@ html.tv .prompt h2{font-size:36px}
   <main class="wrap pb" id="pb"></main>
 </section>
 
+<aside class="tvqr"><img src="qr.png" alt="QR code to join the wall"><span>Scan to post<br>and vote</span></aside>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -222,7 +225,7 @@ let theme="stand", ideas=[], votes=[], online=false, view="wall";
 let answers={}; try{answers=JSON.parse(store("fits-pb")||"{}")}catch(e){answers={}}
 let posted={}; try{posted=JSON.parse(store("fits-posted")||"{}")}catch(e){posted={}}
 if(qs.has("c"))history.replaceState(null,"",location.pathname+location.hash);
-if(location.hash==="#tv")document.documentElement.classList.add("tv");
+const TV=location.hash.startsWith("#tv");if(TV){document.documentElement.classList.add("tv");const t=location.hash.slice(4);if(THEMES.some(x=>x.id===t))theme=t}
 if(location.hash==="#playbook")view="pb";
 
 async function rpc(fn,args){
@@ -250,7 +253,7 @@ $("rename").onclick=()=>openGate(false);
 /* ---------- views ---------- */
 function setView(v){view=v;$("v-wall").hidden=v!=="wall";$("v-pb").hidden=v!=="pb";
   $("tab-wall").setAttribute("aria-selected",v==="wall");$("tab-pb").setAttribute("aria-selected",v==="pb");
-  history.replaceState(null,"",location.pathname+(v==="pb"?"#playbook":""));window.scrollTo(0,0);if(v==="pb")renderPlaybook()}
+  if(!TV)history.replaceState(null,"",location.pathname+(v==="pb"?"#playbook":""));window.scrollTo(0,0);if(v==="pb")renderPlaybook()}
 $("tab-wall").onclick=()=>setView("wall");$("tab-pb").onclick=()=>setView("pb");
 
 /* ---------- wall ---------- */
@@ -393,7 +396,7 @@ window.addEventListener("online",pushPlaybook);
 function renderAll(){renderWall();if(view==="pb")renderPlaybook()}
 setView(view);renderAll();
 if(!code)openGate(true);
-else{load(true).then(()=>{if(!myName)openGate(false);pullPlaybook()}).catch(e=>{if(/bad code/.test(e.message))openGate(true);else toast("Can’t reach the wall. Check your connection.")})}
+else{load(true).then(()=>{if(!myName&&!TV)openGate(false);pullPlaybook()}).catch(e=>{if(/bad code/.test(e.message))openGate(true);else toast("Can’t reach the wall. Check your connection.")})}
 setInterval(()=>{if(code&&!document.hidden)load()},3000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&code)load()});
 </script>
